@@ -1,0 +1,65 @@
+{
+  "name": "@argszero/dsh-dangling-image-guard",
+  "version": "0.1.0",
+  "description": "Degrade an image whose stored attachment object is gone, before the adapter reads it. A dangling image reference throws ATTACHMENT_NOT_FOUND, which is not an LlmError, so the adapter's catch-all rewraps it as the retryable TRANSPORT code and the request is retried against a session that still holds the same reference. This plugin scans the outbound request at the llm/stream waterfall, asks the attachment service for the object's host path, and replaces an occurrence whose object is absent with placeholder text by re-dispatching the rewritten request. Answers discussion #14039.",
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/types/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib/**/*.js",
+    "lib/types/**/*.d.ts",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/argszero/dsh-dangling-image-guard.git"
+  },
+  "homepage": "https://github.com/argszero/dsh-dangling-image-guard#readme",
+  "bugs": {
+    "url": "https://github.com/argszero/dsh-dangling-image-guard/issues"
+  },
+  "keywords": [
+    "cordis",
+    "deepseek-harness",
+    "dsh",
+    "plugin",
+    "attachment",
+    "image",
+    "guard",
+    "retry"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "pretest": "tsc",
+    "test": "node --test \"test/*.spec.mjs\"",
+    "prepublishOnly": "tsc"
+  },
+  "devDependencies": {
+    "@deepseek-ai/cordis": "^4.1.0",
+    "@deepseek-ai/dsh-agent-loop-testkit": "0.2.2-rc.5",
+    "@deepseek-ai/dsh-attachment": "0.2.2-rc.5",
+    "@deepseek-ai/dsh-attachment-local": "0.2.2-rc.5",
+    "@deepseek-ai/dsh-llm": "0.2.2-rc.5",
+    "@types/node": "^24.19.1",
+    "typescript": "^5.9.3"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.2 || >=4.0.5-alpha.1 <5",
+    "@deepseek-ai/dsh-llm": ">=0.2.2-rc.1 <0.3.0"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  }
+}

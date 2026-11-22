@@ -1,0 +1,21 @@
+# The layer this bundle contributes: one row in front of every model request.
+#
+# It changes nothing on its own — with no attachment service mounted, or with a
+# backend that is not host-file-backed, every request passes through untouched.
+# It listens on the `llm/stream` waterfall, asks the attachment service for the
+# host path of each image the request carries, and replaces the ones whose object
+# is absent with placeholder text. The replacement request is dispatched back
+# through `ctx.llm.stream()`, so every other listener and the adapter see it.
+- insert:
+    - id: dangling-image-guard
+      name: '@argszero/dsh-dangling-image-guard'
+      config:
+        # `enforce` (default) replaces a dangling image with placeholder text, so
+        # the adapter reads no reference the store cannot resolve and the turn
+        # continues instead of spending its retry budget on a request that can
+        # never succeed. `observe` scans and counts what it would replace, but
+        # forwards every request unchanged — mount this first on a deployment
+        # whose behaviour you do not want to change yet. `off` mounts nothing.
+        mode: enforce
+        # Log each replacement, each would-be replacement and each scan failure.
+        report: true
