@@ -1,6 +1,6 @@
 {
   "name": "@argszero/dsh-dangling-image-guard",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Degrade an image whose stored attachment object is gone, before the adapter reads it. A dangling image reference throws ATTACHMENT_NOT_FOUND, which is not an LlmError, so the adapter's catch-all rewraps it as the retryable TRANSPORT code and the request is retried against a session that still holds the same reference. This plugin scans the outbound request at the llm/stream waterfall, asks the attachment service for the object's host path, and replaces an occurrence whose object is absent with placeholder text by re-dispatching the rewritten request. Answers discussion #14039.",
   "type": "module",
   "main": "lib/index.js",
@@ -45,17 +45,17 @@
     "prepublishOnly": "tsc"
   },
   "devDependencies": {
-    "@deepseek-ai/cordis": "^4.1.0",
-    "@deepseek-ai/dsh-agent-loop-testkit": "0.2.2-rc.5",
-    "@deepseek-ai/dsh-attachment": "0.2.2-rc.5",
-    "@deepseek-ai/dsh-attachment-local": "0.2.2-rc.5",
-    "@deepseek-ai/dsh-llm": "0.2.2-rc.5",
+    "@deepseek-ai/cordis": "4.2.0-alpha.1",
+    "@deepseek-ai/dsh-agent-loop-testkit": "0.2.3-alpha.2",
+    "@deepseek-ai/dsh-attachment": "0.2.3-alpha.2",
+    "@deepseek-ai/dsh-attachment-local": "0.2.3-alpha.2",
+    "@deepseek-ai/dsh-llm": "0.2.3-alpha.2",
     "@types/node": "^24.19.1",
     "typescript": "^5.9.3"
   },
   "peerDependencies": {
-    "@deepseek-ai/cordis": "^4.0.2 || >=4.0.5-alpha.1 <5",
-    "@deepseek-ai/dsh-llm": ">=0.2.2-rc.1 <0.3.0"
+    "@deepseek-ai/cordis": "^4.0.2 || >=4.0.5-alpha.1 <5 || >=4.2.0-alpha.1 <5",
+    "@deepseek-ai/dsh-llm": ">=0.2.2-rc.1 <0.2.3 || >=0.2.3-alpha.1 <0.3.0"
   },
   "dsh": {
     "bundle": {

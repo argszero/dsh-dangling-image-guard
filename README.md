@@ -20,7 +20,7 @@ The adapter then reads no reference the store cannot resolve, and the turn conti
 The git channel is the only channel today — this package is **not published to npm** yet:
 
 ```sh
-dsh plugin add github:argszero/dsh-dangling-image-guard#v0.1.0
+dsh plugin add github:argszero/dsh-dangling-image-guard#v0.1.1
 ```
 
 The bundle row mounts itself; no further configuration is needed.
@@ -63,7 +63,18 @@ The plugin provides `danglingImageGuard`, whose `snapshot()` reports `repaired`,
 
 The hosting tests run a real `LlmRuntime` under the project's own `mountAgentLoopTestDependencies`, with a real attachment backend; the only double is the adapter, which must be, since no provider may be contacted from a test.
 
-**Line measured: `0.2.2-rc.5`.** The `0.2.3-alpha.1` line cannot be measured here, and not because of this plugin: its `dsh-typert-protocol` calls `ctx[Context.root]`, the vendored cordis source at that tag defines `Context.root`, and the **published** `@deepseek-ai/cordis@4.1.0` has no such symbol — so constructing `LlmRuntime` on that line throws `cannot get property "undefined" without inject` before any request exists. That is the same shape as the alpha.1 CLI startup failure reported as #14044: source changed, version never bumped. This guard will be re-measured on that line when it boots.
+**Lines measured: `0.2.2-rc.5` and `0.2.3-alpha.2`.** Both arms are green — 25/25 on each, with `@deepseek-ai/cordis` 4.1.0 beside `dsh-llm` 0.2.2-rc.5, and 4.2.0-alpha.1 beside 0.2.3-alpha.2. The reverse arm was run on both: remove the listener registration and the same 6 hosting tests fail, the headline one with `'image' !== 'text'`. No source line changed between the two runs; only the dependency generation did.
+
+`0.2.3-alpha.1` stays unmeasured, and not because of this plugin: it cannot construct `LlmRuntime` at all. Its `dsh-typert-protocol` calls `ctx[Context.root]`, the vendored cordis source at that tag defines it, and the **published** `@deepseek-ai/cordis@4.1.0` has no such symbol — so construction throws `cannot get property "undefined" without inject` before any request exists. That is the "source changed, version never bumped" shape alpha.2 repaired; the install there is described in discussion #14044.
+
+The peer ranges name the measured lines separately rather than spanning them with one comparator:
+
+```
+@deepseek-ai/dsh-llm   >=0.2.2-rc.1 <0.2.3 || >=0.2.3-alpha.1 <0.3.0
+@deepseek-ai/cordis    ^4.0.2 || >=4.0.5-alpha.1 <5 || >=4.2.0-alpha.1 <5
+```
+
+The separate segments are not decoration. A prerelease version satisfies a range only if some comparator in it carries the same `major.minor.patch` tuple with a prerelease of its own, so the single span `>=0.2.2-rc.1 <0.3.0` covers `0.2.2-rc.5` and reads as **unsatisfied** for `0.2.3-alpha.2` — measured with semver 7.8.4, the resolver npm itself bundles. The same rule is why `cordis@4.2.0-alpha.1` needs its own segment.
 
 ## Licence
 
